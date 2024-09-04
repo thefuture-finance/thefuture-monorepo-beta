@@ -1,39 +1,42 @@
-import { Hono } from 'hono'
-import { z } from 'zod'
-import { zValidator } from '@hono/zod-validator'
-import { cors } from 'hono/cors'
+import { Hono } from "hono";
+import { zValidator } from "@hono/zod-validator";
+import { jwt, JwtVariables } from "hono/jwt";
+import { cors } from "hono/cors";
+import { z } from "zod";
+import { generateNonce, SiweMessage } from "siwe";
+import {
+  getCookie,
+  getSignedCookie,
+  setCookie,
+  setSignedCookie,
+  deleteCookie,
+} from "hono/cookie";
+import authRoute from "./routes/authRoute";
 
-const app = new Hono()
-app.use(cors({
-    origin: 'http://localhost:5173',
-    allowHeaders: ['X-Custom-Header', 'Upgrade-Insecure-Requests'],
-    allowMethods: ['POST', 'GET', 'OPTIONS'],
-    exposeHeaders: ['Content-Length', 'X-Kuma-Revision'],
-    maxAge: 600,
-    credentials: true,
-  }))
+type Variables = {
+  session: any;
+} & JwtVariables;
 
-const route = app.post(
-  '/posts',
-  zValidator(
-    'form',
-    z.object({
-      title: z.string(),
-      body: z.string(),
-    })
-  ),
-  (c) => {
-    // ...
-    return c.json(
-      {
-        ok: true,
-        message: 'Created!',
-      },
-      201
-    )
-  }
-)
+const app = new Hono<{ Variables: Variables }>();
 
-export type AppType = typeof route
-export default app
+app.use(
+  cors({
+    origin: "http://localhost:5173", // Specify the exact origin
+    allowHeaders: ["X-Custom-Header", "Content-Type"],
+    exposeHeaders: ["Set-Cookie"],
+    credentials: true, // Allow cookies to be sent and received
+  }),
+);
 
+app.use(async (c, next) => {
+  const cookie = getCookie(c, "session") || {};
+  console.log(cookie);
+  // const session = JSON.parse(cookie);
+  await next();
+});
+
+const routes = app.route("/auth", authRoute);
+
+export type AppType = typeof routes;
+
+export default app;

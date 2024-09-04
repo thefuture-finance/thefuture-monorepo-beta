@@ -3,14 +3,11 @@ import { AppType } from '../../../backend/src/index.ts'
 import { hc } from 'hono/client'
 import { queryOptions, useSuspenseQuery } from '@tanstack/react-query'
 import { queryClient } from '../main.tsx'
-const client = hc<AppType>('http://localhost:3000/')
+import ConnectButton from '../components/ConnectWallet.tsx'
+// const client = hc<AppType>('http://localhost:3000/')
 
 async function fetchPosts() {
- const resp = await client.posts.$post({form:{title:"asd",body:"asd"}})
-  if (!resp.ok) {
-  }
-  return await resp.json()
-}
+  return "asd"}
 
 const postsQueryOptions = queryOptions({
   queryKey: ['posts'],
@@ -26,8 +23,8 @@ export const Route = createFileRoute('/')({
 
     return (
       <div>
-        ads
-        {data.data.message ?? ""}
+        <ConnectButton/>
+        {data.data ?? ""}
       </div>
     )
 }

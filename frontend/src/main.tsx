@@ -5,6 +5,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
+import { AppKit } from "./context/web3modal";
 
 // Create a new Query Client
 export const queryClient = new QueryClient();
@@ -26,7 +27,9 @@ if (!rootElement.innerHTML) {
   root.render(
     <StrictMode>
       <QueryClientProvider client={queryClient}>
-        <RouterProvider router={router} />
+        <AppKit>
+          <RouterProvider router={router} />
+        </AppKit>
       </QueryClientProvider>
     </StrictMode>,
   );
