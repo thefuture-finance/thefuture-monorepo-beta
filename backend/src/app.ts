@@ -19,7 +19,13 @@ type Variables = {
   session: any;
 } & JwtVariables;
 
-export const app = new Hono<{ Variables: Variables }>();
+export const app = new Hono<{
+  Bindings: {
+    DATABASE_URL: string;
+    REDIS_URL: string;
+  };
+  Variables: Variables;
+}>();
 
 app.use(
   cors({
@@ -31,9 +37,11 @@ app.use(
 );
 
 app.use(async (c, next) => {
-  const cookie = getCookie(c, "session") || {};
-  console.log(cookie);
-  // const session = JSON.parse(cookie);
+  const cookie = getCookie(c, "session");
+  if (cookie) {
+    const session = JSON.parse(cookie);
+    c.set("session", session);
+  }
   await next();
 });
 

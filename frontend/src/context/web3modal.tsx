@@ -1,6 +1,6 @@
 import { createWeb3Modal, defaultConfig } from "@web3modal/ethers/react";
 import { hc } from "hono/client";
-import { AppType } from "../../../backend/src/index.ts";
+import { AppType } from "../../../backend/src/app.ts";
 const client = hc<AppType>("http://localhost:3000", {
   init: {
     credentials: "include",
@@ -101,15 +101,12 @@ async function signOut() {
 
 /* Function that returns the user's session - this should come from your SIWE backend */
 async function getSession() {
-  console.log("session");
   try {
-    const res = await client.auth.personal_information.$get({});
+    const res = await client.auth.personal_information.$get();
     if (!res.ok) {
-      console.log("ads");
       throw new Error("Network response was not ok");
     }
     const data = await res.json();
-    console.log("ads");
     return data as SIWESession;
   } catch (err) {
     throw new Error("Network response was not ok");
@@ -119,7 +116,6 @@ async function getSession() {
 /* Use your SIWE server to verify if the message and the signature are valid */
 const verifyMessage = async ({ message, signature }: SIWEVerifyMessageArgs) => {
   try {
-    console.log(message, signature);
     const response = await client.auth.verify.$post({
       json: { message, signature },
     });

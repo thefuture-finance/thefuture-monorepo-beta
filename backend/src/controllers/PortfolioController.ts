@@ -4,5 +4,5 @@ import { generateNonce } from "siwe";
 const factory = createFactory();
 
 export const getPortfolioData = factory.createHandlers((c) => {
-  return c.text(`You are authenticated and your address is`);
+  return c.json({ data: "asd" });
 });

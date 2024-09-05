@@ -11,6 +11,7 @@ const verifySchema = z.object({
   message: z.string(),
   signature: z.string(),
 });
+export type VerifySchemaType = z.infer<typeof verifySchema>;
 
 const authRoute = new Hono()
   .get("/personal_information", ...getPersonelInformation)
