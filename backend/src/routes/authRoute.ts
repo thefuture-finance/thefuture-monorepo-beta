@@ -2,6 +2,7 @@ import { Hono } from "hono";
 import {
   getNonce,
   getPersonelInformation,
+  logOut,
   verify,
 } from "../controllers/AuthController";
 import { zValidator } from "@hono/zod-validator";
@@ -25,6 +26,7 @@ const authRoute = new Hono()
     }),
     ...verify,
   )
+  .post("logout", ...logOut)
   .get("/nonce", ...getNonce);
 
 export default authRoute;

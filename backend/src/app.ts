@@ -14,18 +14,21 @@ import {
 import authRoute from "./routes/authRoute";
 import portfolioRoute from "./routes/portfolioRoute";
 import explorerRoute from "./routes/explorerRoute";
+import addressBookRoute from "./routes/addressBookRoute";
 
 type Variables = {
   session: any;
 } & JwtVariables;
 
-export const app = new Hono<{
+export type Env = {
   Bindings: {
     DATABASE_URL: string;
     REDIS_URL: string;
   };
   Variables: Variables;
-}>();
+};
+
+export const app = new Hono<Env>();
 
 app.use(
   cors({
@@ -37,17 +40,20 @@ app.use(
 );
 
 app.use(async (c, next) => {
+  console.log("middleware 1");
   const cookie = getCookie(c, "session");
   if (cookie) {
     const session = JSON.parse(cookie);
     c.set("session", session);
   }
+  console.log("cookie", c.get("session"));
   await next();
 });
 
 const routes = app
   .route("/auth", authRoute)
   .route("/portfolio", portfolioRoute)
-  .route("explorer", explorerRoute);
+  .route("explorer", explorerRoute)
+  .route("/addressBook", addressBookRoute);
 
 export type AppType = typeof routes;

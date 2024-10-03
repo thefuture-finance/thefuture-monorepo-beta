@@ -1,22 +1,23 @@
 import { Hono } from "hono";
-import { setCookie } from "hono/cookie";
+import { deleteCookie, setCookie } from "hono/cookie";
 import { createFactory, createMiddleware } from "hono/factory";
 import { generateNonce, SiweMessage } from "siwe";
-const factory = createFactory();
+import { Env } from "../app";
+
+const factory = createFactory<Env>();
 
 export const getPersonelInformation = factory.createHandlers((c) => {
   if (!c.get("session").signature) {
     console.log("err");
     c.status(401);
-    return c.json({ message: "You have to first sign_in" });
+    return c.text("You have to first sign_in");
   }
   console.log("User is authenticated!");
   c.header("Content-Type", "text/plain");
   const session = c.get("session");
-  console.log(session);
   return c.json({
-    message: session.message.address,
-    chainId: session.message.chainId,
+    message: session.message.address as string,
+    chainId: session.message.chainId as number,
   });
 });
 
@@ -68,4 +69,9 @@ export const getNonce = factory.createHandlers((c) => {
     expires: new Date(Date.UTC(2024, 11, 24, 10, 30, 59, 900)),
   });
   return c.json(nonce);
+});
+
+export const logOut = factory.createHandlers((c) => {
+  deleteCookie(c, "session");
+  return c.json(true);
 });

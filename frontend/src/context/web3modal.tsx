@@ -96,7 +96,12 @@ async function getNonce() {
 }
 
 async function signOut() {
-  return false;
+  const response = await client.auth.logout.$post();
+  if (!response.ok) {
+    return false;
+  }
+  const data = await response.json();
+  return data;
 }
 
 /* Function that returns the user's session - this should come from your SIWE backend */
@@ -115,6 +120,7 @@ async function getSession() {
 
 /* Use your SIWE server to verify if the message and the signature are valid */
 const verifyMessage = async ({ message, signature }: SIWEVerifyMessageArgs) => {
+  console.log("asd");
   try {
     const response = await client.auth.verify.$post({
       json: { message, signature },

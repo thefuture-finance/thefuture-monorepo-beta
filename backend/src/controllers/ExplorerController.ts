@@ -3,8 +3,9 @@ import { createFactory, createMiddleware } from "hono/factory";
 import { generateNonce } from "siwe";
 import { HTTPException } from "hono/http-exception";
 import Redis from "ioredis";
+import { Env } from "../app";
 
-const factory = createFactory();
+const factory = createFactory<Env>();
 
 export type BitcoinData = {
   id: string;
@@ -58,7 +59,7 @@ export const getMarketData = factory.createHandlers(async (c) => {
 
     const data: BitcoinData[] = await response.json();
 
-    await redisClient.set("explorer", JSON.stringify(data), "EX", 60);
+    await redisClient.set("explorer", JSON.stringify(data), "EX", 45);
 
     if (!response.ok) {
       throw new HTTPException(500, { message: "INTERNAL SERVER ERROR" });
